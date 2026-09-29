@@ -39,19 +39,20 @@ QUALITY_OPTIONS = {
 
 def find_svtplay_dl() -> list:
     """
-    Возвращает команду для запуска svtplay-dl.
-    Приоритет:
-      1. svtplay-dl.exe рядом со скриптом/exe
-      2. python.exe из venv рядом со скриптом  -> python -m svtplay_dl
-      3. системный PATH
+    Returns the command to run svtplay-dl.
+    Priority:
+      1. svtplay-dl.exe next to the script/exe
+      2. python.exe from .venv next to the script -> python -m svtplay_dl
+      3. system PATH
+      4. python in PATH + module
     """
-    # 1. svtplay-dl.exe рядом с нашим файлом
+    # 1. svtplay-dl.exe next to our file
     for name in ["svtplay-dl.exe", "svtplay-dl"]:
         p = os.path.join(SCRIPT_DIR, name)
         if os.path.isfile(p):
             return [p]
 
-    # 2. venv рядом со скриптом (для разработки)
+    # 2. venv next to the script (for development)
     venv_python = os.path.join(SCRIPT_DIR, ".venv", "Scripts", "python.exe")
     if os.path.isfile(venv_python):
         return [venv_python, "-m", "svtplay_dl"]
@@ -61,7 +62,7 @@ def find_svtplay_dl() -> list:
     if found:
         return [found]
 
-    # 4. python в PATH + модуль
+    # 4. python in PATH + module
     py = shutil.which("python") or shutil.which("python3")
     if py:
         return [py, "-m", "svtplay_dl"]
@@ -294,7 +295,7 @@ class App(ctk.CTk):
     _ETA_RE = re.compile(r"ETA:\s*([\w:]+)")
 
     def _parse_progress(self, line):
-        # формат svtplay-dl: [099/500][=====.....] ETA: 13:36:59
+        # svtplay-dl format: [099/500][=====.....] ETA: 13:36:59
         m = self._POS_RE.search(line)
         if m and int(m.group(2)) > 0:
             if self.progress.cget("mode") != "determinate":
@@ -312,7 +313,7 @@ class App(ctk.CTk):
         if not url:
             return None, "Please enter a URL."
 
-        cmd = find_svtplay_dl()          # правильная команда запуска
+        cmd = find_svtplay_dl()
         cmd.extend(QUALITY_OPTIONS.get(self.quality_var.get(), []))
 
         out = self.dir_var.get().strip()
@@ -371,8 +372,8 @@ class App(ctk.CTk):
             self.after(0, self._done, self._process.wait() == 0)
         except FileNotFoundError as e:
             self.after(0, self._append_log,
-                       f"[ERROR] Не найден: {e}\n"
-                       "Убедись что svtplay-dl установлен: pip install svtplay-dl\n")
+                       f"[ERROR] Not found: {e}\n"
+                       "Make sure svtplay-dl is installed: pip install svtplay-dl\n")
             self.after(0, self._done, False)
 
     def _done(self, ok):
@@ -389,7 +390,7 @@ class App(ctk.CTk):
             self.eta_lbl.configure(text="  ✓  Audio + video merged to .mp4")
         else:
             self._set_status("Failed ✗", "#FF6B6B")
-            self.eta_lbl.configure(text="  ✗  Смотри лог выше")
+            self.eta_lbl.configure(text="  ✗  See log above")
 
     def _stop(self):
         if self._process and self._process.poll() is None:
