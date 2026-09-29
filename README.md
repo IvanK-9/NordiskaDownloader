@@ -4,9 +4,6 @@ A desktop GUI for [svtplay-dl](https://github.com/spaam/svtplay-dl), the command
 
 Built with Python, [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter) and Pillow. The logo (download arrow + Swedish cross) is drawn in code, so there are no image assets.
 
-<!-- Add a screenshot after a successful download, then uncomment:
-![NordiskaDownloader](docs/screenshot.png)
--->
 
 ## Features
 
